@@ -1,30 +1,36 @@
-- name: Create file
-  run: |
-    DATE=$(date '+%Y-%m-%d-%H-%M')
-    mkdir -p daily
+name: Daily Market Update
 
-    echo "<!DOCTYPE html>" > daily/$DATE.html
-    echo "<html><head><meta charset='UTF-8'><title>Market</title>" >> daily/$DATE.html
+on:
+  workflow_dispatch:
 
-    echo "<style>
-    body { font-family: Arial; background:#f5f7fa; margin:40px;}
-    .card {background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-    h1 {color:#1a73e8;}
-    </style>" >> daily/$DATE.html
+jobs:
+  update-site:
+    runs-on: ubuntu-latest
 
-    echo "</head><body>" >> daily/$DATE.html
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    echo "<h1>Spring Hill Market Daily - $DATE</h1>" >> daily/$DATE.html
+      - name: Create file
+        run: |
+          DATE=$(date '+%Y-%m-%d-%H-%M')
+          mkdir -p daily
+          echo "<!DOCTYPE html>" > daily/$DATE.html
+          echo "<html><head><meta charset='UTF-8'><title>Market</title></head><body>" >> daily/$DATE.html
+          echo "<h1>Spring Hill Market Daily - $DATE</h1>" >> daily/$DATE.html
+          echo "<h2>Top 5 Market News</h2>" >> daily/$DATE.html
+          echo "<p><b>1. Fed outlook remains uncertain</b><br>EN: Markets remain cautious.<br>CN: 市场保持谨慎。</p>" >> daily/$DATE.html
+          echo "<p><b>2. AI stocks strong</b><br>EN: AI attracts investment.<br>CN: AI吸引资金。</p>" >> daily/$DATE.html
+          echo "<p><b>3. Oil fluctuates</b><br>EN: Energy volatile.<br>CN: 能源波动。</p>" >> daily/$DATE.html
+          echo "<p><b>4. Jobs slow</b><br>EN: Hiring cools.<br>CN: 就业放缓。</p>" >> daily/$DATE.html
+          echo "<p><b>5. Markets mixed</b><br>EN: Global mixed.<br>CN: 全球分化。</p>" >> daily/$DATE.html
+          echo "<div style='background:#fff3cd;padding:15px;border-left:6px solid #ffc107;margin-top:30px;'><strong>Important:</strong> This content is for informational purposes only and does not constitute financial advice.<br><br><strong>重要提示：</strong>本内容仅供信息参考，不构成投资建议。</div>" >> daily/$DATE.html
+          echo "</body></html>" >> daily/$DATE.html
 
-    echo "<div class='card'>" >> daily/$DATE.html
-    echo "<h2>Top 5 Market News</h2>" >> daily/$DATE.html
-
-    echo "<p><b>1. Fed outlook remains uncertain</b><br>EN: Markets remain cautious.<br>CN: 市场保持谨慎。</p>" >> daily/$DATE.html
-    echo "<p><b>2. AI stocks strong</b><br>EN: AI attracts investment.<br>CN: AI吸引资金。</p>" >> daily/$DATE.html
-    echo "<p><b>3. Oil fluctuates</b><br>EN: Energy volatile.<br>CN: 能源波动。</p>" >> daily/$DATE.html
-    echo "<p><b>4. Jobs slow</b><br>EN: Hiring cools.<br>CN: 就业放缓。</p>" >> daily/$DATE.html
-    echo "<p><b>5. Markets mixed</b><br>EN: Global mixed.<br>CN: 全球分化。</p>" >> daily/$DATE.html
-
-    echo "</div>" >> daily/$DATE.html
-
-    echo "</body></html>" >> daily/$DATE.html
+      - name: Commit
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "update" || echo "no change"
+          git push
