@@ -15,7 +15,7 @@ jobs:
 
       - name: Generate daily page
         run: |
-          DATE=$(date +'%Y-%m-%d')
+          DATE=$(date +'%Y-%m-%d'-%H-%M')
           MONTH_DAY=$(date +'%B %d, %Y')
           FILE="daily/$DATE.html"
 
