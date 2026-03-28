@@ -3,70 +3,28 @@
     DATE=$(date '+%Y-%m-%d-%H-%M')
     mkdir -p daily
 
-    cat > daily/$DATE.html <<EOF
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Spring Hill Market Daily</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          margin: 40px;
-          background-color: #f5f7fa;
-        }
-        h1 {
-          color: #1a73e8;
-        }
-        .card {
-          background: white;
-          padding: 20px;
-          margin-bottom: 20px;
-          border-radius: 10px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .warning {
-          background: #fff3cd;
-          padding: 15px;
-          border-left: 6px solid #ffc107;
-          border-radius: 8px;
-          margin-top: 30px;
-        }
-      </style>
-    </head>
+    echo "<!DOCTYPE html>" > daily/$DATE.html
+    echo "<html><head><meta charset='UTF-8'><title>Market</title>" >> daily/$DATE.html
 
-    <body>
+    echo "<style>
+    body { font-family: Arial; background:#f5f7fa; margin:40px;}
+    .card {background:white; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+    h1 {color:#1a73e8;}
+    </style>" >> daily/$DATE.html
 
-    <h1>Spring Hill Market Daily - $DATE</h1>
+    echo "</head><body>" >> daily/$DATE.html
 
-    <div class="card">
-      <h2>Top 5 Market News</h2>
+    echo "<h1>Spring Hill Market Daily - $DATE</h1>" >> daily/$DATE.html
 
-      <p><b>1. Fed outlook remains uncertain</b><br>
-      EN: Markets remain cautious as Fed signals mixed direction.<br>
-      CN: 美联储政策不确定，市场保持谨慎。</p>
+    echo "<div class='card'>" >> daily/$DATE.html
+    echo "<h2>Top 5 Market News</h2>" >> daily/$DATE.html
 
-      <p><b>2. AI stocks continue strong momentum</b><br>
-      EN: AI sector continues to attract investment.<br>
-      CN: 人工智能板块持续吸引资金。</p>
+    echo "<p><b>1. Fed outlook remains uncertain</b><br>EN: Markets remain cautious.<br>CN: 市场保持谨慎。</p>" >> daily/$DATE.html
+    echo "<p><b>2. AI stocks strong</b><br>EN: AI attracts investment.<br>CN: AI吸引资金。</p>" >> daily/$DATE.html
+    echo "<p><b>3. Oil fluctuates</b><br>EN: Energy volatile.<br>CN: 能源波动。</p>" >> daily/$DATE.html
+    echo "<p><b>4. Jobs slow</b><br>EN: Hiring cools.<br>CN: 就业放缓。</p>" >> daily/$DATE.html
+    echo "<p><b>5. Markets mixed</b><br>EN: Global mixed.<br>CN: 全球分化。</p>" >> daily/$DATE.html
 
-      <p><b>3. Oil prices fluctuate</b><br>
-      EN: Energy market shows volatility.<br>
-      CN: 能源市场波动加剧。</p>
+    echo "</div>" >> daily/$DATE.html
 
-      <p><b>4. Job market slows slightly</b><br>
-      EN: Hiring pace shows signs of cooling.<br>
-      CN: 就业增长略有放缓。</p>
-
-      <p><b>5. Global markets mixed</b><br>
-      EN: International markets show mixed performance.<br>
-      CN: 全球市场表现分化。</p>
-    </div>
-
-    <div class="warning">
-      <strong>Important:</strong> This content is for informational purposes only and does not constitute financial advice.
-      <br><br>
-      <strong>重要提示：</strong> 本内容仅供信息参考，不构成投资建议。
-    </div>
-
-    </body>
+    echo "</body></html>" >> daily/$DATE.html
