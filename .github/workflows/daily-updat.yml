@@ -15,8 +15,19 @@ jobs:
         run: |
           DATE=$(date +'%Y-%m-%d-%H-%M')
           mkdir -p daily
-          echo "<h1>$DATE</h1>" > daily/$DATE.html
-          echo "<p>Auto generated page</p>" >> daily/$DATE.html
+
+          echo "<h1>Spring Hill Market Daily - $DATE</h1>" > daily/$DATE.html
+          echo "<h2>Top 5 Market News</h2>" >> daily/$DATE.html
+
+          echo "<p><b>1. Fed outlook remains uncertain</b><br>EN: Markets remain cautious as Fed signals mixed direction.<br>CN: 美联储政策不确定，市场保持谨慎。</p>" >> daily/$DATE.html
+
+          echo "<p><b>2. AI stocks continue strong momentum</b><br>EN: AI sector continues to attract investment.<br>CN: 人工智能板块持续吸引资金。</p>" >> daily/$DATE.html
+
+          echo "<p><b>3. Oil prices fluctuate</b><br>EN: Energy market shows volatility.<br>CN: 能源市场波动加剧。</p>" >> daily/$DATE.html
+
+          echo "<p><b>4. Job market slows slightly</b><br>EN: Hiring pace shows signs of cooling.<br>CN: 就业增长略有放缓。</p>" >> daily/$DATE.html
+
+          echo "<p><b>5. Global markets mixed</b><br>EN: International markets show mixed performance.<br>CN: 全球市场表现分化。</p>" >> daily/$DATE.html
 
       - name: Commit
         run: |
