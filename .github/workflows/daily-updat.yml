@@ -1,0 +1,54 @@
+name: Daily Market Update
+
+on:
+  schedule:
+    - cron: '0 13 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-site:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Generate daily page
+        run: |
+          DATE=$(date +'%Y-%m-%d')
+          MONTH_DAY=$(date +'%B %d, %Y')
+          FILE="daily/$DATE.html"
+
+          mkdir -p daily
+
+          cat > $FILE <<EOF
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <title>$MONTH_DAY - Spring Hill Market Daily</title>
+          </head>
+          <body style="font-family: Arial; max-width: 800px; margin: auto;">
+            <h1>Spring Hill Market Daily</h1>
+
+            <div style="background:#fff8db;padding:12px;border:1px solid #ccc;">
+              <strong>Important:</strong> This content is for informational purposes only and does not constitute investment advice. Investment involves risk. Please consult a qualified financial professional before making any investment decisions.
+              <br><br>
+              重要提示：本内容仅供信息参考，不构成投资建议。投资有风险，请在做出任何投资决策前咨询专业金融人士。
+            </div>
+
+            <h2>$MONTH_DAY</h2>
+
+            <p>This is an automatically generated daily page.</p>
+            <p>这是一个自动生成的每日页面。</p>
+
+          </body>
+          </html>
+          EOF
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Daily update $(date +'%Y-%m-%d')" || echo "No changes"
