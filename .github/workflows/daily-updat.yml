@@ -1,38 +1,72 @@
-name: Daily Market Update
+- name: Create file
+  run: |
+    DATE=$(date '+%Y-%m-%d-%H-%M')
+    mkdir -p daily
 
-on:
-  workflow_dispatch:
+    cat > daily/$DATE.html <<EOF
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Spring Hill Market Daily</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 40px;
+          background-color: #f5f7fa;
+        }
+        h1 {
+          color: #1a73e8;
+        }
+        .card {
+          background: white;
+          padding: 20px;
+          margin-bottom: 20px;
+          border-radius: 10px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .warning {
+          background: #fff3cd;
+          padding: 15px;
+          border-left: 6px solid #ffc107;
+          border-radius: 8px;
+          margin-top: 30px;
+        }
+      </style>
+    </head>
 
-jobs:
-  update-site:
-    runs-on: ubuntu-latest
+    <body>
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    <h1>Spring Hill Market Daily - $DATE</h1>
 
-      - name: Create file
-        run: |
-          DATE=$(date +'%Y-%m-%d-%H-%M')
-          mkdir -p daily
+    <div class="card">
+      <h2>Top 5 Market News</h2>
 
-          echo "<h1>Spring Hill Market Daily - $DATE</h1>" > daily/$DATE.html
-          echo "<h2>Top 5 Market News</h2>" >> daily/$DATE.html
+      <p><b>1. Fed outlook remains uncertain</b><br>
+      EN: Markets remain cautious as Fed signals mixed direction.<br>
+      CN: 美联储政策不确定，市场保持谨慎。</p>
 
-          echo "<p><b>1. Fed outlook remains uncertain</b><br>EN: Markets remain cautious as Fed signals mixed direction.<br>CN: 美联储政策不确定，市场保持谨慎。</p>" >> daily/$DATE.html
+      <p><b>2. AI stocks continue strong momentum</b><br>
+      EN: AI sector continues to attract investment.<br>
+      CN: 人工智能板块持续吸引资金。</p>
 
-          echo "<p><b>2. AI stocks continue strong momentum</b><br>EN: AI sector continues to attract investment.<br>CN: 人工智能板块持续吸引资金。</p>" >> daily/$DATE.html
+      <p><b>3. Oil prices fluctuate</b><br>
+      EN: Energy market shows volatility.<br>
+      CN: 能源市场波动加剧。</p>
 
-          echo "<p><b>3. Oil prices fluctuate</b><br>EN: Energy market shows volatility.<br>CN: 能源市场波动加剧。</p>" >> daily/$DATE.html
+      <p><b>4. Job market slows slightly</b><br>
+      EN: Hiring pace shows signs of cooling.<br>
+      CN: 就业增长略有放缓。</p>
 
-          echo "<p><b>4. Job market slows slightly</b><br>EN: Hiring pace shows signs of cooling.<br>CN: 就业增长略有放缓。</p>" >> daily/$DATE.html
+      <p><b>5. Global markets mixed</b><br>
+      EN: International markets show mixed performance.<br>
+      CN: 全球市场表现分化。</p>
+    </div>
 
-          echo "<p><b>5. Global markets mixed</b><br>EN: International markets show mixed performance.<br>CN: 全球市场表现分化。</p>" >> daily/$DATE.html
+    <div class="warning">
+      <strong>Important:</strong> This content is for informational purposes only and does not constitute financial advice.
+      <br><br>
+      <strong>重要提示：</strong> 本内容仅供信息参考，不构成投资建议。
+    </div>
 
-      - name: Commit
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add .
-          git commit -m "update" || echo "no change"
-          git push
+    </body>
