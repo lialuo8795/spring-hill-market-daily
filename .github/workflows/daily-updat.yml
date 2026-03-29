@@ -11,26 +11,40 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install jq
+      - name: Install tools
         run: |
           sudo apt-get update
           sudo apt-get install -y jq
 
-      - name: Generate content
+      - name: Fetch Yahoo News
+        run: |
+          curl -s "https://finance.yahoo.com/rss/topstories" > news.xml
+
+      - name: Extract news
+        run: |
+          TITLES=$(grep -o '<title>.*</title>' news.xml | sed 's/<[^>]*>//g' | tail -n +2 | head -n 5)
+          LINKS=$(grep -o '<link>.*</link>' news.xml | sed 's/<[^>]*>//g' | tail -n +2 | head -n 5)
+
+          paste <(echo "$TITLES") <(echo "$LINKS") > news.txt
+
+      - name: Generate AI summary
         run: |
           export TZ='America/Chicago'
           DATE=$(date +'%Y-%m-%d-%H-%M')
-          mkdir -p daily
+
+          CONTENT=$(cat news.txt)
 
           RESPONSE=$(curl https://api.openai.com/v1/responses \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${{ secrets.OPENAI_API_KEY }}" \
-            -d '{
-              "model": "gpt-4.1-mini",
-              "input": "Write 5 concise US market news summaries. Each item must include EN and CN."
-            }')
+            -d "{
+              \"model\": \"gpt-4.1-mini\",
+              \"input\": \"Summarize these news into EN and CN with title, summary, and keep link:\\n$CONTENT\"
+            }")
 
-          CONTENT=$(echo "$RESPONSE" | jq -r '.output[0].content[0].text')
+          OUTPUT=$(echo "$RESPONSE" | jq -r '.output[0].content[0].text')
+
+          mkdir -p daily
 
           {
             echo '<!DOCTYPE html>'
@@ -40,11 +54,9 @@ jobs:
             echo '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
             echo '<title>Spring Hill Market Daily</title>'
             echo '<style>'
-            echo 'body { font-family: Arial, sans-serif; background:#f6f7fb; padding:20px; margin:0; }'
+            echo 'body { font-family: Arial; background:#f6f7fb; padding:20px; }'
             echo '.container { max-width:900px; margin:auto; }'
-            echo '.card { background:white; padding:20px; margin:15px 0; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.06); }'
-            echo 'h1 { text-align:center; }'
-            echo 'pre { white-space:pre-wrap; line-height:1.7; }'
+            echo '.card { background:white; padding:20px; margin:15px 0; border-radius:10px; }'
             echo '</style>'
             echo '</head>'
             echo '<body>'
@@ -52,7 +64,7 @@ jobs:
             echo "<h1>Spring Hill Market Daily - $DATE</h1>"
             echo '<div class="card">'
             echo '<pre>'
-            echo "$CONTENT"
+            echo "$OUTPUT"
             echo '</pre>'
             echo '</div>'
             echo '</div>'
@@ -65,5 +77,5 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add .
-          git commit -m "AI daily update" || echo "No changes"
+          git commit -m "AI + Yahoo daily update" || echo "No changes"
           git push
