@@ -1,28 +1,48 @@
-- name: Generate AI market content
-  run: |
-    export TZ='America/Chicago'
-    DATE=$(date +'%Y-%m-%d-%H-%M')
+name: Daily AI Market Update
 
-    mkdir -p daily
+on:
+  workflow_dispatch:
 
-    echo "Calling OpenAI..."
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-    RESPONSE=$(curl https://api.openai.com/v1/responses \
-      -H "Content-Type: application/json" \
-      -H "Authorization: Bearer ${{ secrets.OPENAI_API_KEY }}" \
-      -d '{
-        "model": "gpt-4.1-mini",
-        "input": "Write 5 concise US market news summaries. Each item must include EN and CN. Format as numbered list."
-      }')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    echo "$RESPONSE"
+      - name: Install jq
+        run: sudo apt-get install -y jq
 
-    CONTENT=$(echo $RESPONSE | jq -r '.output[0].content[0].text')
+      - name: Generate AI market content
+        run: |
+          export TZ='America/Chicago'
+          DATE=$(date +'%Y-%m-%d-%H-%M')
 
-    echo "Generating HTML..."
+          mkdir -p daily
 
-    echo "<!DOCTYPE html>" > daily/$DATE.html
-    echo "<html><head><meta charset='UTF-8'><title>Market</title></head><body>" >> daily/$DATE.html
-    echo "<h1>Spring Hill Market Daily - $DATE</h1>" >> daily/$DATE.html
-    echo "<pre>$CONTENT</pre>" >> daily/$DATE.html
-    echo "</body></html>" >> daily/$DATE.html
+          echo "Calling OpenAI..."
+
+          RESPONSE=$(curl https://api.openai.com/v1/responses \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.OPENAI_API_KEY }}" \
+            -d '{
+              "model": "gpt-4.1-mini",
+              "input": "Write 5 concise US market news summaries. Each item must include EN and CN. Format as numbered list."
+            }')
+
+          CONTENT=$(echo $RESPONSE | jq -r '.output[0].content[0].text')
+
+          echo "<!DOCTYPE html>" > daily/$DATE.html
+          echo "<html><head><meta charset='UTF-8'><title>Market</title></head><body>" >> daily/$DATE.html
+          echo "<h1>Spring Hill Market Daily - $DATE</h1>" >> daily/$DATE.html
+          echo "<pre>$CONTENT</pre>" >> daily/$DATE.html
+          echo "</body></html>" >> daily/$DATE.html
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add .
+          git commit -m "AI daily update"
+          git push
