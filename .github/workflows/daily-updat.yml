@@ -1,48 +1,45 @@
-name: Daily AI Market Update
+- name: Generate AI market content
+  run: |
+    sudo apt-get update
+    sudo apt-get install -y jq
 
-on:
-  workflow_dispatch:
+    export TZ='America/Chicago'
+    DATE=$(date +'%Y-%m-%d-%H-%M')
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+    mkdir -p daily
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    echo "Calling OpenAI..."
 
-      - name: Install jq
-        run: sudo apt-get install -y jq
+    RESPONSE=$(curl https://api.openai.com/v1/responses \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer ${{ secrets.OPENAI_API_KEY }}" \
+      -d '{
+        "model": "gpt-4.1-mini",
+        "input": "Write 5 concise US market news summaries. Each item must include EN and CN."
+      }')
 
-      - name: Generate AI market content
-        run: |
-          export TZ='America/Chicago'
-          DATE=$(date +'%Y-%m-%d-%H-%M')
+    CONTENT=$(echo $RESPONSE | jq -r '.output[0].content[0].text')
 
-          mkdir -p daily
+    echo "Generating HTML..."
 
-          echo "Calling OpenAI..."
-
-          RESPONSE=$(curl https://api.openai.com/v1/responses \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${{ secrets.OPENAI_API_KEY }}" \
-            -d '{
-              "model": "gpt-4.1-mini",
-              "input": "Write 5 concise US market news summaries. Each item must include EN and CN. Format as numbered list."
-            }')
-
-          CONTENT=$(echo $RESPONSE | jq -r '.output[0].content[0].text')
-
-          echo "<!DOCTYPE html>" > daily/$DATE.html
-          echo "<html><head><meta charset='UTF-8'><title>Market</title></head><body>" >> daily/$DATE.html
-          echo "<h1>Spring Hill Market Daily - $DATE</h1>" >> daily/$DATE.html
-          echo "<pre>$CONTENT</pre>" >> daily/$DATE.html
-          echo "</body></html>" >> daily/$DATE.html
-
-      - name: Commit and push
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add .
-          git commit -m "AI daily update"
-          git push
+    cat <<EOF > daily/$DATE.html
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Spring Hill Market Daily</title>
+<style>
+body { font-family: Arial; background:#f6f7fb; padding:20px; }
+.container { max-width:800px; margin:auto; }
+.card { background:white; padding:20px; margin:15px 0; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+h1 { text-align:center; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Spring Hill Market Daily - $DATE</h1>
+<pre>$CONTENT</pre>
+</div>
+</body>
+</html>
+EOF
