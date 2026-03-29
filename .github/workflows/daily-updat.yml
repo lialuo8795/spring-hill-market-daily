@@ -1,5 +1,5 @@
 - name: Generate AI market content
-  run: 
+  run: |
     export TZ='America/Chicago'
     DATE=$(date +'%Y-%m-%d-%H-%M')
 
