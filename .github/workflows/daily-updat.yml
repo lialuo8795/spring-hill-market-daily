@@ -15,6 +15,7 @@ jobs:
 
       - name: Generate daily page
         run: |
+          export TZ='America/Chicago'
           DATE=$(date +'%Y-%m-%d-%H-%M')
           mkdir -p daily
 
